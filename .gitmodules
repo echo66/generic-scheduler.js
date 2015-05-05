@@ -1,0 +1,3 @@
+[submodule "bpm-timeline.js"]
+	path = bpm-timeline.js
+	url = https://github.com/echo66/bpm-timeline.js.git
