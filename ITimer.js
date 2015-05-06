@@ -1,6 +1,10 @@
 function ITimer() {}
 
-ITimer.prototype.on_tick = function(id, callback) {
+ITimer.prototype.on = function(observerID, eventType, callback) {
+	throws "Not implemented";
+}
+
+ITimer.prototype.off = function(observerID, eventType) {
 	throws "Not implemented";
 }
 
@@ -17,5 +21,13 @@ ITimer.prototype.reset = function() {
 }
 
 ITimer.prototype.time = function() {
+	throws "Not implemented";
+}
+
+ITimer.prototype.unit = function() {
+	throws "Not implemented";
+}
+
+ITimer.prototype.id = function() {
 	throws "Not implemented";
 }
