@@ -1,0 +1,19 @@
+<!DOCTYPE html>
+<html lang="en-EN">
+	<head>
+		<script type="text/javascript" src="WAATimer.js"></script>
+		<script type="text/javascript" src="WebWorkerTimer.js"></script>
+	</head>
+	<body>
+		<script type="text/javascript">
+			var ID1 = "my-timer-1"; 
+			var ctx = new AudioContext();
+			var t1 = new WAATimer({id: ID1, audioContext: ctx});
+			t1.on('ticker-1', 'tick', function(data) { console.log('tick-1'); });
+
+			var ID2 = "my-timer-2";
+			var t2 = new WebWorkerTimer({id: ID2, tickInterval: 0.025});
+			t2.on('ticker-2', 'tick', function(data) { console.log('tick-2'); });
+		</script>
+	</body>
+</html>

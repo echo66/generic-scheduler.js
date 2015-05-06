@@ -1,16 +1,24 @@
+/*
+ * params: {
+ *   id: String,
+ *   audioContext: AudioContext,
+ *   bufferSize (opt): Number
+ * }
+ */
 function WAATimer(params) {
 	
+	var _self = this;
 	var _id = params.id;
 	var _idCounter = 0;
 	var _callbacks = { tick : {}, start: {}, stop : {}, reset: {} };
 	var _audioContext = params.audioContext;
-	var _clockNode = _audioContext.createScriptProcessor(256, 1, 1);
+	var _clockNode = _audioContext.createScriptProcessor(params.bufferSize || 256, 1, 1);
 	var _currentTime = 0;
 	var _offset;
 	var _running = false;
 
-	_clockNode._clockNode.onaudioprocess = function () {
-		_currentTime += self.context.currentTime - _offset - _currentTime;
+	_clockNode.onaudioprocess = function () {
+		_currentTime += _audioContext.currentTime - _offset - _currentTime;
 		_emit('tick', {id: _id, time: _currentTime});
 	}
 
@@ -22,10 +30,10 @@ function WAATimer(params) {
 	this.on = function(observerID, eventType, callback) {
 
 		if (!eventType || _callbacks[eventType]==undefined) 
-			throws "Unsupported event type";
+			throw "Unsupported event type";
 
 		if (observerID!=undefined && _callbacks[eventType][observerID]!=undefined) 
-			throws "Illegal modification of callback";
+			throw "Illegal modification of callback";
 
 		var __id = (observerID==undefined)? _id + "-associate-" + (_idCounter++) : observerID;
 		_callbacks[eventType][__id] = callback;
@@ -34,7 +42,7 @@ function WAATimer(params) {
 
 	this.off = function(observerID, eventType) {
 		if (!eventType || _callbacks[eventType]==undefined) 
-			throws "Unsupported event type";
+			throw "Unsupported event type";
 
 		delete _callbacks[eventType][observerID];
 	}
@@ -67,5 +75,9 @@ function WAATimer(params) {
 
 	this.id = function() {
 		return _id;
+	}
+
+	this.units = function() {
+		return "seconds";
 	}
 }

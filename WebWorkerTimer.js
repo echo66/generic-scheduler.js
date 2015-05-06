@@ -1,7 +1,7 @@
 /*
  * params: {
  *   id: String, 
- *   tickInterval: Number (opt) (miliseconds)
+ *   tickInterval (opt): Number (miliseconds)
  * }
  */
 function WebWorkerTimer(params) {
@@ -9,8 +9,8 @@ function WebWorkerTimer(params) {
 	var _self = this;
 	var _id = params.id;
 	var _tickInterval = params.tickInterval || 0.025*1000;
-	var _counterId = 0;
-	var _callbacks = {};
+	var _idCounter = 0;
+	var _callbacks = { tick : {}, start: {}, stop : {}, reset: {} };
 	var _timerJS = URL.createObjectURL(
 		new Blob([
 			"var t=0;" +
@@ -19,7 +19,7 @@ function WebWorkerTimer(params) {
 			"	if(e.data)" +
 			"		t = setInterval(function() {" +
 			"			postMessage(0);" +
-			"		}, e.data)}";
+			"		}, e.data)}"
 		], { 
 			type: "text/javascript" 
 		})
@@ -38,10 +38,10 @@ function WebWorkerTimer(params) {
 	this.on = function(observerID, eventType, callback) {
 
 		if (!eventType || _callbacks[eventType]==undefined) 
-			throws "Unsupported event type";
+			throw "Unsupported event type";
 
 		if (observerID!=undefined && _callbacks[eventType][observerID]!=undefined) 
-			throws "Illegal modification of callback";
+			throw "Illegal modification of callback";
 
 		var __id = (observerID==undefined)? _id + "-associate-" + (_idCounter++) : observerID;
 		_callbacks[eventType][__id] = callback;
@@ -50,7 +50,7 @@ function WebWorkerTimer(params) {
 
 	this.off = function(observerID, eventType) {
 		if (!eventType || _callbacks[eventType]==undefined) 
-			throws "Unsupported event type";
+			throw "Unsupported event type";
 
 		delete _callbacks[eventType][observerID];
 	}
@@ -93,5 +93,9 @@ function WebWorkerTimer(params) {
 
 	this.id = function() {
 		return _id;
+	}
+
+	this.units = function() {
+		return "seconds";
 	}
 }

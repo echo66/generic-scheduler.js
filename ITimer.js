@@ -31,3 +31,7 @@ ITimer.prototype.unit = function() {
 ITimer.prototype.id = function() {
 	throws "Not implemented";
 }
+
+ITimer.prototype.units = function() {
+	throws "Not implemented";
+}
