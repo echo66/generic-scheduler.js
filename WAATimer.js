@@ -19,7 +19,7 @@ function WAATimer(params) {
 
 	_clockNode.onaudioprocess = function () {
 		_currentTime += _audioContext.currentTime - _offset - _currentTime;
-		_emit('tick', {id: _id, time: _currentTime});
+		_emit('tick', {id: _id, time: _currentTime, units: _self.units});
 	}
 
 	var _emit = function(evenType, data) {
@@ -64,20 +64,14 @@ function WAATimer(params) {
 		}
 	}
 
-	this.time = function() {
-		return _currentTime;
-	}
-
 	this.reset = function() {
 		_currentTime = 0;
 		_emit('reset', {id: _id});
 	}
 
-	this.id = function() {
-		return _id;
-	}
-
-	this.units = function() {
-		return "seconds";
-	}
+	Object.defineProperties(this, {
+		'id' : { value: _id }, 
+		'time' : { value: _currentTime }, 
+		'units': { value: "seconds" }
+	});
 }

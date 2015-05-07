@@ -8,7 +8,7 @@ function WebWorkerTimer(params) {
 	
 	var _self = this;
 	var _id = params.id;
-	var _tickInterval = params.tickInterval || 0.025*1000;
+	var _tickInterval = params.tickInterval || 25;
 	var _idCounter = 0;
 	var _callbacks = { tick : {}, start: {}, stop : {}, reset: {} };
 	var _timerJS = URL.createObjectURL(
@@ -64,7 +64,7 @@ function WebWorkerTimer(params) {
 				var t0 = _currentTime;
 				var t1 = (new Date()).getTime() - _offset;
 	    		_currentTime += t1 - t0;
-	    		_emit('tick', {id: _id, time: _currentTime});
+	    		_emit('tick', {id: _id, time: _currentTime/1000, units: _self.units});
 			};
 
 			_running = true;
@@ -82,20 +82,14 @@ function WebWorkerTimer(params) {
 		}
 	}
 
-	this.time = function() {
-		return _currentTime;
-	}
-
 	this.reset = function() {
 		_currentTime = 0;
 		_emit('reset', {id: _id});
 	}
 
-	this.id = function() {
-		return _id;
-	}
-
-	this.units = function() {
-		return "seconds";
-	}
+	Object.defineProperties(this, {
+		'id' : { value: _id }, 
+		'time' : { value: _currentTime }, 
+		'units': { value: "seconds" }
+	});
 }

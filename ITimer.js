@@ -1,37 +1,41 @@
 function ITimer() {}
 
 ITimer.prototype.on = function(observerID, eventType, callback) {
-	throws "Not implemented";
+	throw "Not implemented";
 }
 
 ITimer.prototype.off = function(observerID, eventType) {
-	throws "Not implemented";
+	throw "Not implemented";
 }
 
 ITimer.prototype.start = function() {
-	throws "Not implemented";
+	throw "Not implemented";
 }
 
 ITimer.prototype.stop = function() {
-	throws "Not implemented";
+	throw "Not implemented";
 }
 
 ITimer.prototype.reset = function() {
-	throws "Not implemented";
+	throw "Not implemented";
+}
+
+ITimer.prototype.started = function() {
+	throw "Not implemented";
 }
 
 ITimer.prototype.time = function() {
-	throws "Not implemented";
-}
-
-ITimer.prototype.unit = function() {
-	throws "Not implemented";
-}
-
-ITimer.prototype.id = function() {
-	throws "Not implemented";
+	throw "Not implemented";
 }
 
 ITimer.prototype.units = function() {
-	throws "Not implemented";
+	throw "Not implemented";
+}
+
+ITimer.prototype.id = function() {
+	throw "Not implemented";
+}
+
+ITimer.prototype.units = function() {
+	throw "Not implemented";
 }

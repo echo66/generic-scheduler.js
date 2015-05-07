@@ -3,17 +3,66 @@
 	<head>
 		<script type="text/javascript" src="WAATimer.js"></script>
 		<script type="text/javascript" src="WebWorkerTimer.js"></script>
+		<script type="text/javascript" src="bpm-timeline.js/formulas.js"></script>
+		<script type="text/javascript" src="bpm-timeline.js/bpm-timeline.js"></script>
+		<script type="text/javascript" src="Event.js"></script>
+		<script type="text/javascript" src="Scheduler.js"></script>
 	</head>
 	<body>
 		<script type="text/javascript">
 			var ID1 = "my-timer-1"; 
 			var ctx = new AudioContext();
 			var t1 = new WAATimer({id: ID1, audioContext: ctx});
-			t1.on('ticker-1', 'tick', function(data) { console.log('tick-1'); });
+			// t1.on('ticker-1', 'tick', function(data) { console.log(data); });
 
 			var ID2 = "my-timer-2";
 			var t2 = new WebWorkerTimer({id: ID2, tickInterval: 0.025});
-			t2.on('ticker-2', 'tick', function(data) { console.log('tick-2'); });
+			// t2.on('ticker-2', 'tick', function(data) { console.log(data); });
+
+			var s1 = new Scheduler({
+				id: 'meu-scheduler-1', 
+				timer: t2, 
+				initialBPM: 60, 
+				removeCompleted: true,
+				units: "beats"
+			});
+
+			s1.add({id:'e0', startTime: 0, start: function(time) { console.log(time); }})
+			s1.add({id:'e1', startTime: 1, start: function(time) { console.log(time); }});
+			s1.add({id:'e2', startTime: 2, start: function(time) { console.log(time); }});
+			s1.add({id:'e3', startTime: 3, start: function(time) { console.log(time); }});
+			s1.add({id:'e4', startTime: 3, start: function(time) { console.log(time); }});
+			s1.add({id:'e5', startTime: 3, start: function(time) { console.log(time); }});
+			s1.add({id:'e6', startTime: 3, start: function(time) { console.log(time); }});
+			s1.add({id:'e7', startTime: 3, start: function(time) { console.log(time); }});
+			s1.add({
+				id:'e8', 
+				startTime: 3, 
+				stopTime: 10,  
+				start: function(time) { console.log("complex start at " + time); }, 
+				tick : function(time) { console.log("complex tick at " + time); }, 
+				stop : function(time) { console.log("complex stop at " + time); }
+			});
+
+
+			/*
+			 * params: {
+			 * 	id: String
+			 * 	startTime: Number, 
+			 * 	stopTime: Number, 
+			 * 	tolerance: { 
+			 * 		early: Number,
+			 * 		late : Number
+			 * 	}
+			 * 	callbacks: {
+			 * 		start: Function(time), 
+			 * 		tick : Function(time), 
+			 * 		reset: Function(time), 
+			 * 		end  : Function(time)
+			 * 	} 
+			 * }
+			 */
+
 		</script>
 	</body>
 </html>
