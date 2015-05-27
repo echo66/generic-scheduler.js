@@ -39,6 +39,9 @@ function Scheduler (params) {
     scheduled : [], 
     executing : []
   };
+
+  var _callbacks = {};
+
   var _eventsCursor = 0;
 
   var _started = false; 
@@ -113,16 +116,24 @@ function Scheduler (params) {
   // Starts the clock.
   this.start = function() {
     if (_started == false) {
-      _offset = _t(_timer.units, _timer.time);
+      _offset = _self._t(_timer.units, _timer.time);
 
       _timer.on(_id, 'tick', function(data) {
-        _currentTime += _t(data.units, data.time) - _offset - _currentTime;
-        _self.tick(_currentTime);
+        if (_started) {
+          _currentTime += _self._t(data.units, data.time) - _offset - _currentTime;
+          _emit('tick', {id:_id, time:_currentTime});
+          _self.tick(_currentTime);
+        } else
+          _offset = _self._t(_timer.units, data.time);
       });
 
       _timer.on(_id, 'reset', function(data) { _offset = 0; });
 
+      _started = true;
+
       _timer.start();
+
+      _emit('start', {id: _id, time: _currentTime});
     }
   }
 
@@ -132,7 +143,8 @@ function Scheduler (params) {
       this._started = false;
       _timer.off(_id, 'tick');
       _timer.off(_id, 'reset');
-      this._timer.stop();
+      // this._timer.stop();
+      _emit('stop', {id: _id, time: _currentTime});
     }  
   }
 
@@ -140,6 +152,7 @@ function Scheduler (params) {
   this.reset = function() {
     this.stop();
     _currentTime = 0;
+    _emit('reset', {id: _id});
   }
 
   // Schedule an event.
@@ -203,7 +216,7 @@ function Scheduler (params) {
     return _id;
   }
 
-  var _t = function(otherUnits, time) {
+  this._t = function(otherUnits, time) {
     if (_units == otherUnits)
       return time;
     else if (_units == "seconds")
@@ -236,7 +249,12 @@ function Scheduler (params) {
     return e;
   }
   
-  this.getBPMTimeline = function() { return _bpmTimeline; }
+  this.get_bpm_timeline = function() { return _bpmTimeline; }
+
+  this.get_timer = function() { return _timer; }
+
+
+
 
   // ---------- Helpers ---------- //
 
@@ -265,4 +283,30 @@ function Scheduler (params) {
         return [middle];
     }
   };
+
+
+  var _emit = function(evenType, data) {
+    for (var ci in _callbacks[evenType]) 
+      _callbacks[evenType][ci](data);
+  }
+
+  this.on = function(observerID, eventType, callback) {
+
+    if (!eventType || _callbacks[eventType]==undefined) 
+      throw "Unsupported event type";
+
+    if (observerID!=undefined && _callbacks[eventType][observerID]!=undefined) 
+      throw "Illegal modification of callback";
+
+    var __id = (observerID==undefined)? _id + "-associate-" + (_idCounter++) : observerID;
+    _callbacks[eventType][__id] = callback;
+    return __id;
+  }
+
+  this.off = function(observerID, eventType) {
+    if (!eventType || _callbacks[eventType]==undefined) 
+      throw "Unsupported event type";
+
+    delete _callbacks[eventType][observerID];
+  }
 }
