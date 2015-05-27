@@ -24,13 +24,16 @@ function BrowserIntervalTimer(params) {
 	
 	this.start = function() {
 		_offset = (new Date()).getTime();
-		_intervalId = setInterval(function(){
-			var t0 = _currentTime;
-			var t1 = (new Date()).getTime() - _offset;
-			_currentTime += t1 - t0;
-			_emit('tick', {id: _id, time: _currentTime/1000, units: _self.units});
-		}, _tickInterval);
+		_intervalId = setInterval(_tick, _tickInterval);
 		_emit('start', {id: _id});
+		_tick();
+	}
+
+	function _tick() {
+		var t0 = _currentTime;
+		var t1 = (new Date()).getTime() - _offset;
+		_currentTime += t1 - t0;
+		_emit('tick', {id: _id, time: _currentTime/1000, units: _self.units});
 	}
 
 	this.stop = function() {

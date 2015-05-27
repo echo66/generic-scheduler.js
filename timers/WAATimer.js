@@ -51,8 +51,8 @@ function WAATimer(params) {
 		if (!_running) {
 			_offset = _audioContext.currentTime;
 			_running = true;
-			_clockNode.connect(_audioContext.destination);
 			_emit('start', {id: _id});
+			_clockNode.connect(_audioContext.destination);
 		}
 	}
 
