@@ -23,10 +23,10 @@ Fields:
 
 Events:
 
-### start
-### stop
-### reset
-### tick
+#### start: {id: String}
+#### stop: {id: String}
+#### reset: {id: String}
+#### tick: {id: String, time: Number, units: String}
 
 ## Available Timers
 
@@ -49,6 +49,11 @@ Methods:
 Fields:
 
 Events:
+
+#### tick: {id: String, time: Number}
+#### start: {id: String, time: Number}
+#### pause: {id: String, time: Number}
+#### reset: {id: String}
 
 ## Future work
 
