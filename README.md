@@ -9,28 +9,40 @@ Yet another javascript scheduling/clock library. This one is based on the lesson
 * In order to allow the modification of the current time of a scheduler, the programmer can choose to retain the events in the scheduler memory. This way, the programmer can go back and forward in the timeline without the need to reinsert the executed events.
 
 
-Timer API
----------
+## Timer API
 
 Methods: 
-* start: void -> void
-* stop: void -> void
-* reset: void -> void
+### start: void -> void
+### stop: void -> void
+### reset: void -> void
 
 Fields:
+### id: String (read only)
+### time: Number (read only)
+### units: String (read only)
 
 Events:
 
-TODO
+### start
+### stop
+### reset
+### tick
 
 ## Available Timers
 
-* WAATimer({id: String, audioContext: AudioContext, bufferSize (default 256): Number})
-* WebWorkerTimer({id: String, tickInterval (default 25): Number (miliseconds)})
-* BrowserIntervalTimer({id: String, tickInterval (default 25): Number (miliseconds)})
+### WAATimer({id: String, audioContext: AudioContext, bufferSize (default 256): Number})
+
+Based in WAAClock, it uses a ScriptProcessor node to send ticks to the schedulers.
+
+### WebWorkerTimer({id: String, tickInterval (default 25): Number (miliseconds)})
+
+Based in neume.js, it uses a Web Worker to send messages to the "main worker" (the window context).
+
+### BrowserIntervalTimer({id: String, tickInterval (default 25): Number (miliseconds)})
+
+A simple timer that uses window.setInterval to generate timer ticks.
 
 ## Scheduler API
-
 
 Methods:
 
@@ -43,5 +55,7 @@ Events:
 Refactor the architecture to allow arbitrary scheduling strategies.
 
 Implement the concept of processes: sets of events that compose a certain process. After the conclusion of all events, the process is said to be completed.
+
+Control the latency introduced by callbacks.
 
 TODO
