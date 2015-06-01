@@ -1,7 +1,7 @@
 # generic-scheduler.js
 
 ## General Description
-Yet another javascript scheduling/clock library. This one is based on the lessons learned from several javascript live coding suites and scheduling libraries, like timbre.js, flocking, neume.js and Chris Wilson blog post. There are several novelties in this solution:
+Yet another javascript scheduling/clock library. This one is based on the lessons learned from several javascript live coding suites and scheduling libraries, like [timbre.js](https://github.com/mohayonao/timbre.js), [flocking](http://flockingjs.org/), [neume.js](https://github.com/mohayonao/neume.js), [Chris Wilson blog post](http://www.html5rocks.com/en/tutorials/audio/scheduling/) and [Jan Monschke MsC thesis work](https://github.com/janmonschke/Web-Audio-Editor). There are several novelties in this solution:
 * It uses BPMTimeline to relate different time units (seconds and beats, in this case). With this, dynamic & continuous tempo manipulations are possible.
 * It establishes a separation of concerns between what a scheduler and a clock are. 
 * It allows scheduling of "complex" events: they have a start, stop and "tick" callbacks. While the current time of the scheduler is bigger than the start time of the event and smaller than the end time of the event, the "tick" callback is invoked.
@@ -44,11 +44,16 @@ A simple timer that uses window.setInterval to generate timer ticks.
 
 ## Scheduler API
 
-Methods:
+### Methods:
+#### start: void -> void
+#### pause: void -> void
+#### reset: void -> void
+#### add: Event | {start: Number, stop: Number, startFn: Function, stopFn (opt): Function, resetFn (opt): Function, tickFn (opt): Function}
+#### clear_events: void -> void
 
-Fields:
+### Fields:
 
-Events:
+### Events:
 
 #### tick: {id: String, time: Number}
 #### start: {id: String, time: Number}
