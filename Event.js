@@ -1,18 +1,18 @@
 /*
  * params: {
  * 	id: String
- * 	startTime: Number, 
- * 	stopTime: Number, 
+ * 	start: Number, 
+ * 	stop: Number, 
  *  units: "seconds" / "beats"
  * 	tolerance: { 
  * 		early: Number,
  * 		late : Number
  * 	}
  * 	callbacks: {
- * 		start: Function(time), 
- * 		tick : Function(time), 
- * 		reset: Function(time), 
- * 		end  : Function(time)
+ * 		startFn: Function(time), 
+ * 		tickFn : Function(time), 
+ * 		resetFn: Function(time), 
+ * 		endFn  : Function(time)
  * 	} 
  * }
  */
@@ -24,8 +24,8 @@ var Event = function(params) {
 		late : params.tolerance.late
 	};
 
-	var _startTime = params.startTime;
-	var _stopTime   = params.stopTime;
+	var _start = params.start;
+	var _stop   = params.stop;
 
 	var _state = 0;
 	var _STATE_ENUM = {
@@ -34,10 +34,19 @@ var Event = function(params) {
 		2 : 'STOPPED'
 	};
 
-	var _start = params.callbacks.start || function(time) {};
-	var _stop  = params.callbacks.stop;
-	var _reset = params.callbacks.reset;
-	var _tick  = params.callbacks.tick;
+	var _startFn = params.callbacks.startFn || function(time) {};
+	var _stopFn  = params.callbacks.stopFn;
+	var _resetFn = params.callbacks.resetFn;
+	var _tickFn  = params.callbacks.tickFn;
+
+	if (_startFn)
+		_startFn.bind(this);
+	if (_stopFn)
+		_startFn.bind(this);
+	if (_resetFn)
+		_resetFn.bind(this);
+	if (_tickFn)
+		_tickFn.bind(this);
 
 	var _units = params.units;
 
@@ -48,32 +57,32 @@ var Event = function(params) {
 		},
 
 		'isOneShot' : {
-			get: function() { return !_stop; }
+			get: function() { return !_stopFn; }
 		}, 
 
 		'isResetable' : {
-			get: function() { return _reset!=undefined; }
+			get: function() { return _resetFn!=undefined; }
 		},
 
 		'isTickable' : {
-			get: function() { return _tick!=undefined; }
+			get: function() { return _tickFn!=undefined; }
 		},
 
 		'startTime'		 : {
-			value: _startTime, 
+			value: _start, 
 			writable: false
 		},
 
 		'earlyStartTime' : {
-			get: function() { return _startTime - _tolerance.early; }
+			get: function() { return Math.max(0, _start - _tolerance.early); }
 		},
 
 		'lateStartTime'  : {
-			get: function() { return _startTime + _tolerance.late; }
+			get: function() { return Math.max(0, _start + _tolerance.late); }
 		}, 
 
 		'stopTime'       : {
-			value: _stopTime, 
+			value: _stop, 
 			writable: false
 		}, 
 
@@ -89,12 +98,12 @@ var Event = function(params) {
 		}
 	});
 
-	this.start = function(time) { _start(time); _state = 1; }
+	this.start = function(time) { _state = 1; _startFn = _startFn.bind(this); _startFn(time); }
 
-	this.tick  = function(time) { _tick(time); }
+	this.tick  = function(time) { _tickFn = _tickFn.bind(this); _tickFn(time); }
 
-	this.stop  = function(time) { _stop(time); _state = 2; }
+	this.stop  = function(time) { _state = 2; _stopFn = _stopFn.bind(this); _stopFn(time); }
 
-	this.reset = function() { _reset(); _state = 0; }
+	this.reset = function(time) { _state = 0; _resetFn = _resetFn.bind(this); _resetFn(); }
 
 }

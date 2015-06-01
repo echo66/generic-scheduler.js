@@ -1,10 +1,12 @@
 <!DOCTYPE html>
 <html lang="en-EN">
 	<head>
-		<script type="text/javascript" src="WAATimer.js"></script>
-		<script type="text/javascript" src="WebWorkerTimer.js"></script>
-		<script type="text/javascript" src="bpm-timeline.js/formulas.js"></script>
-		<script type="text/javascript" src="bpm-timeline.js/bpm-timeline.js"></script>
+		<script type="text/javascript" src="timers/WAATimer.js"></script>
+		<script type="text/javascript" src="timers/WebWorkerTimer.js"></script>
+		<script type="text/javascript" src="timers/BrowserIntervalTimer.js"></script>
+		<script type="text/javascript" src="http://localhost/bpm-timeline.js/formulas.js"></script>
+		<script type="text/javascript" src="http://localhost/bpm-timeline.js/bpm-timeline.js"></script>
+		<script type="text/javascript" src="http://localhost/bpm-timeline.js/modified-binary-search.js"></script>
 		<script type="text/javascript" src="Event.js"></script>
 		<script type="text/javascript" src="Scheduler.js"></script>
 	</head>
@@ -21,44 +23,78 @@
 
 			var s1 = new Scheduler({
 				id: 'meu-scheduler-1', 
-				timer: t2, 
+				timer: t1, 
 				initialBPM: 60, 
-				removeCompleted: true,
+				removeCompleted: false,
 				units: "beats"
 			});
 
-			s1.add({id:'e0', startTime: 0, start: function(time) { console.log(time); }})
-			s1.add({id:'e1', startTime: 1, start: function(time) { console.log(time); }});
-			s1.add({id:'e2', startTime: 2, start: function(time) { console.log(time); }});
-			s1.add({id:'e3', startTime: 3, start: function(time) { console.log(time); }});
-			s1.add({id:'e4', startTime: 3, start: function(time) { console.log(time); }});
-			s1.add({id:'e5', startTime: 3, start: function(time) { console.log(time); }});
-			s1.add({id:'e6', startTime: 3, start: function(time) { console.log(time); }});
-			s1.add({id:'e7', startTime: 3, start: function(time) { console.log(time); }});
-			s1.add({
-				id:'e8', 
-				startTime: 3, 
-				stopTime: 10,  
-				start: function(time) { console.log("complex start at " + time); }, 
-				tick : function(time) { console.log("complex tick at " + time); }, 
-				stop : function(time) { console.log("complex stop at " + time); }
-			});
+			s1.get_bpm_timeline().add_bpm_marker({type: "linear", endBeat: 5, endBPM: 120});
+			s1.get_bpm_timeline().add_bpm_marker({type: "linear", endBeat: 7, endBPM: 140});
+			s1.get_bpm_timeline().add_bpm_marker({type: "linear", endBeat: 11, endBPM: 100});
+			s1.get_bpm_timeline().add_bpm_marker({type: "linear", endBeat: 20, endBPM: 200});
+			s1.get_bpm_timeline().add_bpm_marker({type: "linear", endBeat: 30, endBPM: 130});
+			s1.get_bpm_timeline().add_bpm_marker({type: "linear", endBeat: 40, endBPM: 10});
+			s1.get_bpm_timeline().add_bpm_marker({type: "linear", endBeat: 50, endBPM: 50});
+			s1.get_bpm_timeline().add_bpm_marker({type: "linear", endBeat: 60, endBPM: 100});
+
+			var osc = ctx.createOscillator();
+			var gain = ctx.createGain();
+			osc.connect(gain);
+			gain.connect(ctx.destination);
+			gain.gain.value = 0;
+			osc.start();
+
+			for (var i=0; i<=60; i++) {
+				s1.add({
+					id:'e'+i, 
+					start: i, 
+					startFn: function(time) { 
+						console.log("scheduler passed time: " + time + " | event.start: " + this.startTime); 
+						gain.gain.value = 1; 
+						osc.frequency.value = 880*Math.random(); 
+					}
+				});
+				s1.add({
+					id:'ef'+i, 
+					start: i+1/4, 
+					startFn: function(time) { 
+						console.log(time); 
+						gain.gain.value = 0; 
+					}
+				});
+			}
+
+			// s1.add({id:'e0', start: 0, startFn: function(time) { console.log(time); osc.frequency.value = 880; }})
+
+			// s1.add({id:'e1', start: 1, startFn: function(time) { console.log(time); osc.frequency.value = 440; }});
+			// s1.add({id:'e2', start: 2, startFn: function(time) { console.log(time); osc.frequency.value = 880; }});
+			// s1.add({id:'e3', start: 3, startFn: function(time) { console.log(time); osc.frequency.value = 440; }});
+			// s1.add({id:'e4', start: 4, startFn: function(time) { console.log(time); osc.frequency.value = 880; }});
+			// s1.add({id:'e5', start: 5, startFn: function(time) { console.log(time); osc.frequency.value = 440; }});
+			// s1.add({id:'e6', start: 6, startFn: function(time) { console.log(time); osc.frequency.value = 880; }});
+			// s1.add({id:'e7', start: 7, startFn: function(time) { console.log(time); osc.frequency.value = 440; }});
+			// s1.add({id:'e8', start: 3, stop: 10,  
+			// 	startFn: function(time) { console.log("complex start at " + time); }, 
+			// 	tickFn: function(time) { console.log("complex tick at " + time); }, 
+			// 	stopFn: function(time) { console.log("complex stop at " + time); }
+			// });
 
 
 			/*
 			 * params: {
 			 * 	id: String
-			 * 	startTime: Number, 
-			 * 	stopTime: Number, 
+			 * 	start: Number, 
+			 * 	stop: Number, 
 			 * 	tolerance: { 
 			 * 		early: Number,
 			 * 		late : Number
 			 * 	}
 			 * 	callbacks: {
-			 * 		start: Function(time), 
-			 * 		tick : Function(time), 
-			 * 		reset: Function(time), 
-			 * 		end  : Function(time)
+			 * 		startFn: Function(time), 
+			 * 		tickFn : Function(time), 
+			 * 		resetFn: Function(time), 
+			 * 		endFn  : Function(time)
 			 * 	} 
 			 * }
 			 */
